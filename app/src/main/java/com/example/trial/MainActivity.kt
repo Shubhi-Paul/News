@@ -1,14 +1,15 @@
 package com.example.trial
 
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
-import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
+
 
 class MainActivity : AppCompatActivity(), NewsItemClicked {
 
@@ -27,21 +28,21 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
     }
 
     private fun fetchData(){
-        val url = "https://newsapi.org/v2/top-headlines?sources=techcrunch&apiKey=dacfdb399a5143b2b3143851ce3927f1"
+        val url = "https://newsdata.io/api/1/news?apikey=pub_273058565320a846ea3592f945c83e49ce4c2&language=en&category=health"
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET,
             url,
             null,
             {
-                val newsJsonArray = it.getJSONArray("articles")
+                val newsJsonArray = it.getJSONArray("results")
                 val newsArray = ArrayList<News>()
                 for (i in 0 until newsJsonArray.length()){
                     val newsJsonObject = newsJsonArray.getJSONObject(i)
                     val news = News(
                         newsJsonObject.getString("title"),
-                        newsJsonObject.getString("author"),
-                        newsJsonObject.getString("url"),
-                        newsJsonObject.getString("urlToImage"),
+                        newsJsonObject.getString("creator"),
+                        newsJsonObject.getString("link"),
+                        newsJsonObject.getString("image_url"),
                     )
                     newsArray.add(news)
                 }
@@ -62,6 +63,9 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
     }
 
     override fun onItemClicked(item: News) {
-        TODO("Not yet implemented")
+        val url = item.url
+        val intent = CustomTabsIntent.Builder()
+            .build()
+        intent.launchUrl(this@MainActivity, Uri.parse(url))
     }
 }
